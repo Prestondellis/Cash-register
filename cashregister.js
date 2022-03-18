@@ -5,7 +5,7 @@ function checkCashRegister(price, cash, cid) {
     let roundedNum = parseFloat(num).toPrecision(5)
     cashReg.unshift(roundedNum)
   }
-  console.log(cashReg)
+  //console.log(cashReg)
   var emptyReg = [ 
     [ 'ONE HUNDRED', 0 ],
     [ 'TWENTY', 0 ],
@@ -27,7 +27,7 @@ function checkCashRegister(price, cash, cid) {
     [ 'NICKEL', 5 ],
     [ 'PENNY', 1 ]]
   //console.log(cashReg)
-  let change = (cash * 100) - (price * 100);
+  let changeNeeded = (cash * 100) - (price * 100);
   //console.log(change)
   let changeCount = 0
   //console.log(change - changeCount)
@@ -35,28 +35,43 @@ function checkCashRegister(price, cash, cid) {
     changeCount += emptyReg[i][1] 
   }  
   for (let i = 0; i < cashReg.length; i++){
-    if (changeCount < change && currency[i][1] <= change - changeCount && cashReg[i] > 0 && i >= 0){
+    if (changeCount < changeNeeded 
+    && currency[i][1] <= changeNeeded - changeCount 
+    && cashReg[i] > 0 && i >= 0){
       changeCount += currency[i][1]
       cashReg[i] -= currency[i][1]
       emptyReg[i][1] += currency[i][1]
-      console.log(currency[i][1])
-      if (cashReg[i] !== 0 && currency[i][1] <= change - changeCount){
+      //console.log(currency[i][1])
+      if (cashReg[i] !== 0 && currency[i][1] <= changeNeeded - changeCount){
         i -= i
       }
     }
   }
-  console.log(cashReg)
-  console.log(changeCount)
-  console.log(change - changeCount)
-  console.log(emptyReg)
-  
-  let status = ''; 
-  if (change < 0){
-    status += 'INSUFFICENT_FUNDS'
-  } else if (change > 0){
-    status += 'OPEN'
+  //console.log(cashReg)
+  //console.log(changeCount)
+  //console.log(change - changeCount)
+  //console.log(emptyReg)
+  var result = {
+     status: '',
+     change: [] 
+  } 
+  for (let i = 0; i < cashReg.length; i++){
+    console.log(emptyReg[i][1])
+    if (price === cash){
+      result.change.push(cid).reverse
+    }
+    else if (emptyReg[i][1] > 0 && changeNeeded - changeCount === 0){
+      result.change.push([currency[i][0], (emptyReg[i][1] * 0.01)])
+    }
   }
-  return 'status: "' + status + '"';
+  if (changeNeeded < 0 || changeNeeded - changeCount !== 0){
+    result.status += 'INSUFFICIENT_FUNDS'
+  } else if (changeNeeded > 0){
+    result.status += 'OPEN'
+  } else if (price === change){
+    result.status += 'CLOSED'
+  }
+  return result
 }
-
-console.log(checkCashRegister(19.5, 20, [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]]));
+//console.log({status: "INSUFFICIENT_FUNDS", change: []})
+console.log(checkCashRegister(19.5, 20, [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]]));
